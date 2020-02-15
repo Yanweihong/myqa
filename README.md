@@ -1,5 +1,62 @@
-# myqa
-My Qusetion-Answer System
+# WikiQA
+
+My Qusetion-Answer System：Use Wiki-articles relative to question to generate answers
+
+基于Flask框架，界面如下：
+
+![image-20200215180058497](assets/image-20200215180058497.png)
+
+# Components
+
+```
+wikiQA
+│  app.py
+│  stopwords.txt
+│  tools.py
+│  v2.db 存储wiki-article的数据库
+│  
+├─model 存储rank需要的模型（TODO：可用map整合为一个）
+│      corpus.pkl
+│      doc2idx.pkl
+│      sklearn_tfidf.pkl
+│      tfidf_matrix.pkl
+│      
+├─scripts 脚本文件，用于构建数据库以及预处理
+│  │  __init__.py
+│  │  
+│  └─retriever
+│          build_db.py
+│          build_tdidf.py
+│          convert.py
+│          prep_file.py
+│          prep_text.py
+│          __init__.py
+│          
+├─static 
+│  ├─css
+│  │      bootstrap.css
+│  │      custom.min.css
+│  │      
+│  └─js
+│          jquery-3.4.1.min.js
+│          load.js
+│          
+├─templates
+│      index.html
+│      
+└─wikiqa
+    │  __init__.py
+    │  
+    └─retriever
+            doc_db.py
+            elasticsearch_ranker.py TODO
+            jieba_tfidf_ranker.py 残次
+            sklearn_tfidf_ranker.py 可用
+            utils.py
+            __init__.py
+            
+
+```
 
 # Retriver
 
@@ -46,16 +103,22 @@ prep_text.py，构建数据库时，使用multiprocess中的Pool进行多线程�
 
 ## 构建数据库
 
-使用sqlite3存储id，title和text（由于文章本身的id没有任何意义无需存储，之后若有时间将title作为primary key重新构建数据库）
+使用sqlite3存储文章的title和text
 
 ## 构建排序模型
 
-1. one-gram Tf-idf Ranker
+1. 1-gram Tf-idf Ranker
 
    使用sklearn中的TfidfVectorizer
 
-2. n-gram（TODO）
+2. 2-gram
+
+   ```python
+   tfidf_model = TfidfVectorizer(token_pattern=r"(?u)\b\w+\b", stop_words=stopwords, ngram_range=(1, 2)).fit(corpus)
+   ```
+
+   调整参数ngram_range
 
 # Document Reader
 
-（TODO）
+（TODO：通过TOP5 articles获取答案）
